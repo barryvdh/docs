@@ -159,7 +159,7 @@ Of course, you may assign default values to options:
 <a name="prompting-for-input"></a>
 ## Prompting For Input
 
-In addition to displaying output, you may also ask the user to provide input during the execution of your command.
+In addition to display output, you may also ask the user to provide input during the execution of your command. The `ask` and `confirm` prompt the user for input:
 
 The `ask` method will prompt the user with the given question, accept their input, and then return the user's input back to your command. This method is useful for gathering user options while a command is executing:
 
@@ -177,10 +177,6 @@ The `secret` method is similar to `ask`; however, the user's input will not be v
 
 	$password = $this->secret('What is the password?');
 
-The `askWithCompletion` method can be used to provided autocompletion for possible choices. The user can still choose any answer, regardless of the choices.
-
-	$name = $this->askWithCompletion('What is your name?', ['Taylor', 'Dayle']);
-
 #### Asking The User For Confirmation
 
 If you need to ask the user for a simple confirmation, you may use the `confirm` method. By default, this method will return `false`. However, if the user enters `y` in response to the prompt, the method will return `true`.
@@ -192,13 +188,6 @@ If you need to ask the user for a simple confirmation, you may use the `confirm`
 You may also specify a default value to the `confirm` method, which should be `true` or `false`:
 
 	$this->confirm($question, true);
-
-#### Giving The User A Choice
-
-If you need to give the user a predefined set of choices, you may use the `choice` method. The user chooses the index of the answer, but the value of the answer will be returned to you. You may set the default value to be returned if nothing is chosen:
-
-	$name = $this->choice('What is your name?', ['Taylor', 'Dayle'], false);
-
 
 <a name="working-with-input"></a>
 ## Working With Input
@@ -259,6 +248,30 @@ To display an information message to the user, use the `info` method. Typically,
 To display an error message, use the `error` method. Error message text is typically displayed in red:
 
 	$this->error('Something went wrong!');
+
+### Table Layouts
+
+If you have a lot of data to show, a table could be more appropriate. The `table` method makes it easy to correctly format multiple rows/columns. Just pass in the headers and rows, the width and height will be dynamiccally calculated.
+
+	$headers = ['Name', 'Email'];
+	$users = User::all(['name', 'email'])->toArray();
+	$this->table($headers, $users);
+	
+### Progress Bar
+
+For long running tasks, it could be helpful to show a progress indicator. Using the output object, we can start, advance and stop the Progress Bar. You have to define the number of steps when you start the progress and advance the Progress Bar after each step.
+
+	$users = User::all();
+        $this->output->progressStart(count($users));
+        
+        foreach ($users as $user) {
+            $this->doSomething($user);
+            $this->output->progressAdvance();
+        }
+        
+        $this->output->progressFinish();
+	
+For more advanced options, look at the [Progress Bar component documentation](http://symfony.com/doc/2.7/components/console/helpers/progressbar.html).
 
 <a name="registering-commands"></a>
 ## Registering Commands
